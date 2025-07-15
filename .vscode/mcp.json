@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "The-Way": {
+      "url": "http://localhost:3000",
+      "description": "Torah App"
+    }
+  },
+  "autoReload": true
+}
