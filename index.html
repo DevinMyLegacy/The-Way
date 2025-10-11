@@ -584,11 +584,11 @@
 
         <!-- Navigation -->
         <nav class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('daily')">Daily</button>
-            <button class="nav-tab" onclick="switchTab('torah')">Torah</button>
-            <button class="nav-tab" onclick="switchTab('parasha')">Parasha</button>
-            <button class="nav-tab" onclick="switchTab('calendar')">Calendar</button>
-            <button class="nav-tab" onclick="switchTab('resources')">Resources</button>
+            <button class="nav-tab active" onclick="switchTab(this,'daily')">Daily</button>
+            <button class="nav-tab" onclick="switchTab(this,'torah')">Torah</button>
+            <button class="nav-tab" onclick="switchTab(this,'parasha')">Parasha</button>
+            <button class="nav-tab" onclick="switchTab(this,'calendar')">Calendar</button>
+            <button class="nav-tab" onclick="switchTab(this,'resources')">Resources</button>
         </nav>
 
         <!-- Daily Section -->
@@ -644,10 +644,10 @@
             <div class="card">
                 <div class="card-title">Commentaries</div>
                 <div>
-                    <button class="commentary-btn active" onclick="loadCommentary('rashi')">Rashi</button>
-                    <button class="commentary-btn" onclick="loadCommentary('ibn-ezra')">Ibn Ezra</button>
-                    <button class="commentary-btn" onclick="loadCommentary('sforno')">Sforno</button>
-                    <button class="commentary-btn" onclick="loadCommentary('ramban')">Ramban</button>
+                    <button class="commentary-btn active" onclick="loadCommentary(this,'rashi')">Rashi</button>
+                    <button class="commentary-btn" onclick="loadCommentary(this,'ibn-ezra')">Ibn Ezra</button>
+                    <button class="commentary-btn" onclick="loadCommentary(this,'sforno')">Sforno</button>
+                    <button class="commentary-btn" onclick="loadCommentary(this,'ramban')">Ramban</button>
                 </div>
                 <div class="commentary-content" id="commentaryContent">
                     <strong>Rashi on Genesis 1:1:</strong><br>
@@ -757,8 +757,8 @@
             <div class="content-section" id="calendar">
                 <div class="card">
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                        <button class="calendar-type-btn active" onclick="switchCalendar('hebrew')">📅 Hebrew</button>
-                        <button class="calendar-type-btn" onclick="switchCalendar('dss')">📜 DSS</button>
+                        <button class="calendar-type-btn active" onclick="switchCalendar(this,'hebrew')">📅 Hebrew</button>
+                        <button class="calendar-type-btn" onclick="switchCalendar(this,'dss')">📜 DSS</button>
                     </div>
                 </div>
 
@@ -1155,7 +1155,7 @@
         }
 
         // Tab Functions
-        function switchTab(tabName) {
+        function switchTab(el, tabName) {
             // Remove active from all tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -1166,15 +1166,15 @@
                 section.classList.remove('active');
             });
             
-            // Activate clicked tab
-            event.target.classList.add('active');
+            // Activate clicked tab using passed element
+            if (el && el.classList) el.classList.add('active');
             document.getElementById(tabName).classList.add('active');
             
             showToast('Switched to ' + tabName);
         }
 
         // Commentary Functions
-        function loadCommentary(type) {
+    function loadCommentary(el, type) {
             const commentaries = {
                 'rashi': 'In the beginning of God\'s creating the heavens and the earth. The text does not intend to point out the order of the acts of Creation...',
                 'ibn-ezra': 'The word "beginning" refers to the beginning of time itself. Before this, there was no time, no space, only the infinite Ein Sof.',
@@ -1186,7 +1186,7 @@
             document.querySelectorAll('.commentary-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (el && el.classList) el.classList.add('active');
 
             // Update content
             document.getElementById('commentaryContent').innerHTML = 
@@ -1571,12 +1571,12 @@
         }
 
         // Calendar Functions
-        function switchCalendar(type) {
+        function switchCalendar(el, type) {
             // Update buttons
             document.querySelectorAll('.calendar-type-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (el && el.classList) el.classList.add('active');
 
             // Show/hide calendars
             if (type === 'hebrew') {
