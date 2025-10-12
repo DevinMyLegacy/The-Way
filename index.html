@@ -1875,5 +1875,85 @@
 
         document.addEventListener('DOMContentLoaded', () => { try { renderResources(); } catch {} try { renderCalendar('weekly'); } catch {} });
         </script>
+        
+        <!-- Service Worker registration (idempotent) -->
+        <script>
+        try {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(e => {
+                    console.warn('SW registration failed:', e);
+                });
+            }
+        } catch (e) { console.warn('SW register error', e); }
+        </script>
+
+        <!-- Hebrew calendar loader: tries to load offline tables and extends existing renderCalendar -->
+        <script>
+        // ---- Hebrew calendar loader (offline tables) -------------------------------
+        window.calendarData ||= {};
+        window.calendarData.hebrewDates ||= {};
+        window.calendarData.parasha ||= {};
+
+        let __hebrewLoaded = false;
+        let __hebrewLoadPromise = null;
+
+        async function loadHebrewTables() {
+            if (__hebrewLoadPromise) return __hebrewLoadPromise;
+            __hebrewLoadPromise = (async () => {
+                try {
+                    const [hebRes, parRes] = await Promise.all([
+                        fetch('data/hebrew/hebdate-2025.json').then(r => r.ok ? r.json() : null).catch(() => null),
+                        fetch('data/parasha/parasha-5786.json').then(r => r.ok ? r.json() : null).catch(() => null),
+                    ]);
+                    if (hebRes) window.calendarData.hebrewDates = hebRes;
+                    if (parRes) window.calendarData.parasha = parRes;
+                    __hebrewLoaded = true;
+                } catch (e) {
+                    console.warn('Hebrew tables failed to load:', e);
+                    __hebrewLoaded = false;
+                }
+            })();
+            return __hebrewLoadPromise;
+        }
+
+        function ymd(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+        function mondayStart(d){const x=new Date(d);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);x.setHours(0,0,0,0);return x;}
+
+        function hebrewWeeklyFromTables(anchor = new Date()) {
+            const start = mondayStart(anchor);
+            const days = Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d;});
+            const H = window.calendarData.hebrewDates || {};
+            const P = window.calendarData.parasha || {};
+            return days.map(d => {
+                const k = ymd(d);
+                const h = H[k];
+                const p = P[k];
+                return {
+                    date: k,
+                    title: h ? `Hebrew: ${h.hYear}/${h.hMonth}/${h.hDay}` : 'Hebrew: (no table)',
+                    notes: p?.name ? `Parasha: ${p.name}${p?.diaspora===false?' (IL)':''}` : ''
+                };
+            });
+        }
+
+        // Non-breaking wrapper: extend existing renderCalendar
+        (function() {
+            const __origRenderCalendar = window.renderCalendar;
+            window.renderCalendar = async function(type = 'weekly') {
+                if (type === 'hebrew') {
+                    if (!__hebrewLoaded) await loadHebrewTables();
+                    const entries = hebrewWeeklyFromTables(new Date());
+                    if (typeof window.renderCalendarData === 'function') {
+                        return renderCalendarData(entries, 'HEBREW Calendar');
+                    }
+                    // Fallback minimal renderer:
+                    const wrap = document.querySelector('#calendarGrid, #calendar, #calendarContainer, [data-role="calendar"]');
+                    if (wrap) wrap.innerHTML = `\n      <div class="calendar-list">\n        ${entries.map(e => `\n          <div class="cal-day">\n            <div class="cal-date">${e.date}</div>\n            <div class="cal-title">${e.title}</div>\n            ${e.notes ? `<div class="cal-notes">${e.notes}</div>` : ''}\n          </div>`).join('')}\n      </div>`;
+                    return;
+                }
+                return __origRenderCalendar ? __origRenderCalendar(type) : undefined;
+            };
+        })();
+        </script>
 </body>
 </html>
