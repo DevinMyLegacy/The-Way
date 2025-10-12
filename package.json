@@ -1,0 +1,13 @@
+{
+  "name": "the-way-tests",
+  "version": "1.0.0",
+  "description": "Simple Puppeteer smoke tests for The Way app",
+  "private": true,
+  "scripts": {
+    "test:puppeteer": "node test/puppeteer-test.js"
+  },
+  "dependencies": {
+    "jsdom": "^27.0.0",
+    "puppeteer": "^21.3.8"
+  }
+}

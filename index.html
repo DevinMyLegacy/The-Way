@@ -519,11 +519,11 @@
         </div>
 
         <!-- About Modal -->
-        <div class="modal" id="aboutModal" onclick="closeModalOnClick(event, 'aboutModal')">
+        <div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle" onclick="closeModalOnClick(event, 'aboutModal')">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title">📖 About The Way</div>
-                    <button class="modal-close" onclick="closeModal('aboutModal')">×</button>
+                    <div class="modal-title" id="aboutModalTitle">📖 About The Way</div>
+                    <button class="modal-close" aria-label="Close dialog" onclick="closeModal('aboutModal')">×</button>
                 </div>
                 <div class="modal-body">
                     <h3>Our Mission</h3>
@@ -543,11 +543,11 @@
         </div>
 
         <!-- Settings Modal -->
-        <div class="modal" id="settingsModal" onclick="closeModalOnClick(event, 'settingsModal')">
+        <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle" onclick="closeModalOnClick(event, 'settingsModal')">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title">⚙️ Settings</div>
-                    <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+                    <div class="modal-title" id="settingsModalTitle">⚙️ Settings</div>
+                    <button class="modal-close" aria-label="Close dialog" onclick="closeModal('settingsModal')">×</button>
                 </div>
                 <div class="modal-body">
                     <h3>Display Settings</h3>
@@ -558,11 +558,11 @@
         </div>
 
         <!-- Donate Modal -->
-        <div class="modal" id="donateModal" onclick="closeModalOnClick(event, 'donateModal')">
+        <div class="modal" id="donateModal" role="dialog" aria-modal="true" aria-labelledby="donateModalTitle" onclick="closeModalOnClick(event, 'donateModal')">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title">💝 Support</div>
-                    <button class="modal-close" onclick="closeModal('donateModal')">×</button>
+                    <div class="modal-title" id="donateModalTitle">💝 Support</div>
+                    <button class="modal-close" aria-label="Close dialog" onclick="closeModal('donateModal')">×</button>
                 </div>
                 <div class="modal-body">
                     <h3>Coming Soon</h3>
@@ -753,11 +753,12 @@
                     <li><strong>Lech-Lecha:</strong> Genesis 12:1-17:27</li>
                 </ul>
             </div>
+        </div>
 
             <!-- Calendar Section -->
             <div class="content-section" id="calendar">
                 <div class="card">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;" data-role="calendar-tabs">
                         <button class="calendar-type-btn active" onclick="switchCalendar(this,'hebrew')">📅 Hebrew</button>
                         <button class="calendar-type-btn" onclick="switchCalendar(this,'dss')">📜 DSS</button>
                     </div>
@@ -767,13 +768,13 @@
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <div class="card-title" style="margin: 0;" id="currentMonth">October 2025</div>
-                            <div>
-                                <button class="btn btn-primary" onclick="changeMonth(-1)">← Prev</button>
-                                <button class="btn btn-primary" onclick="changeMonth(0)">Today</button>
-                                <button class="btn btn-primary" onclick="changeMonth(1)">Next →</button>
                             </div>
+                            </div>
+                    <!-- Resources Section -->
                         </div>
-                        <div class="calendar-grid" id="calendarGrid"></div>
+                        <div id="calendarContainer">
+                            <div class="calendar-grid" id="calendarGrid"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -993,13 +994,14 @@
             <!-- Resources Section -->
             <div class="content-section" id="resources">
                 <div class="card">
-                    <div class="card-title">Open Source Torah Sites</div>
-                    <p><strong>Complete Libraries:</strong></p>
-                    <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
-                        <li><a href="https://www.sefaria.org" target="_blank">Sefaria.org</a> - Complete Jewish texts</li>
-                        <li><a href="https://www.torahclass.com" target="_blank">TorahClass.com</a> - Video teachings</li>
-                        <li><a href="https://www.mechon-mamre.org" target="_blank">Mechon Mamre</a> - Hebrew/English texts</li>
-                    </ul>
+                        <div class="card-title">Open Source Torah Sites</div>
+                        <div id="resourcesList" data-role="resources"></div>
+                        <p><strong>Complete Libraries:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                            <li><a href="https://www.sefaria.org" target="_blank">Sefaria.org</a> - Complete Jewish texts</li>
+                            <li><a href="https://www.torahclass.com" target="_blank">TorahClass.com</a> - Video teachings</li>
+                            <li><a href="https://www.mechon-mamre.org" target="_blank">Mechon Mamre</a> - Hebrew/English texts</li>
+                        </ul>
                     
                     <p style="margin-top: 15px;"><strong>Public Domain Texts:</strong></p>
                     <ul style="margin-left: 20px; margin-top: 10px;">
@@ -1149,28 +1151,23 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        function closeModalOnClick(event, modalId) {
-            if (event.target.classList.contains('modal')) {
+        // Close modal when clicking on backdrop only (not inside modal content)
+        function closeModalOnClick(e, modalId) {
+            // Ensure event and targets exist, and only close when the backdrop itself was clicked
+            if (e && e.currentTarget === e.target && e.target.classList && e.target.classList.contains('modal')) {
                 closeModal(modalId);
             }
         }
 
         // Tab Functions
         function switchTab(el, tabName) {
-            // Remove active from all tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Activate clicked tab using passed element
+            // tabs
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             if (el && el.classList) el.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-            
+            // sections
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            const section = document.getElementById(tabName);
+            if (section) section.classList.add('active');
             showToast('Switched to ' + tabName);
         }
 
@@ -1183,16 +1180,15 @@
                 'ramban': 'The act of creation was not instantaneous but followed a divine plan. Each element was created in its proper time and sequence.'
             };
 
-            // Update buttons
-            document.querySelectorAll('.commentary-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // buttons
+            document.querySelectorAll('.commentary-btn').forEach(b => b.classList.remove('active'));
             if (el && el.classList) el.classList.add('active');
-
-            // Update content
-            document.getElementById('commentaryContent').innerHTML = 
-                `<strong>${type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')} on Genesis 1:1:</strong><br>${commentaries[type]}`;
-            
+            // content
+            const content = document.getElementById('commentaryContent');
+            if (content) {
+                content.innerHTML =
+                    `<strong>${type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')} on Genesis 1:1:</strong><br>${commentaries[type] || ''}`;
+            }
             showToast('Loaded ' + type + ' commentary');
         }
 
@@ -1573,23 +1569,21 @@
 
         // Calendar Functions
         function switchCalendar(el, type) {
-            // Update buttons
-            document.querySelectorAll('.calendar-type-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // buttons
+            document.querySelectorAll('.calendar-type-btn').forEach(b => b.classList.remove('active'));
             if (el && el.classList) el.classList.add('active');
-
-            // Show/hide calendars
+            // views
+            const heb = document.getElementById('hebrewCalendar');
+            const dss = document.getElementById('dssCalendar');
             if (type === 'hebrew') {
-                document.getElementById('hebrewCalendar').style.display = 'block';
-                document.getElementById('dssCalendar').style.display = 'none';
+                if (heb) heb.style.display = 'block';
+                if (dss) dss.style.display = 'none';
                 renderCalendar();
             } else {
-                document.getElementById('hebrewCalendar').style.display = 'none';
-                document.getElementById('dssCalendar').style.display = 'block';
-                calculateDSSDate(); // Calculate and display DSS date
+                if (heb) heb.style.display = 'none';
+                if (dss) dss.style.display = 'block';
+                calculateDSSDate();
             }
-
             showToast('Switched to ' + (type === 'hebrew' ? 'Hebrew' : 'DSS') + ' calendar');
         }
 
@@ -1809,5 +1803,77 @@
         console.log('📖 The Way - Torah Study App v2.0');
         console.log('✅ All features functional and ready!');
     </script>
+        <script>
+        // --- Resilient Calendar & Resources (safe fallbacks & diagnostics) ---
+        // Utilities
+        function first(...sels) {
+            for (const s of sels) { const el = document.querySelector(s); if (el) return el; }
+            return null;
+        }
+        function ensureArray(x) { return Array.isArray(x) ? x : []; }
+        function logWarnOnce(key, msg) {
+            window.__warned ??= new Set();
+            if (!window.__warned.has(key)) { console.warn(msg); window.__warned.add(key); }
+        }
+
+        // Guard globals
+        window.commentaries ||= {};
+        window.resources   ||= [];
+        window.calendars   ||= {};
+
+        // Resources renderer
+        function renderResources() {
+            const list = first('#resourcesList', '#resources', '[data-role="resources"]');
+            if (!list) {
+                logWarnOnce('resources-container-missing', 'Resources container not found (expected #resourcesList/#resources/[data-role="resources"]).');
+                return;
+            }
+            const items = ensureArray(window.resources);
+            if (items.length === 0) {
+                list.innerHTML = `\n      <div class="empty-state">\n        <h3>No resources yet</h3>\n        <p>We couldn't find any resources to display.</p>\n        <ul class="hints">\n          <li>Check that <code>window.resources</code> is defined and is an array.</li>\n        </ul>\n        <button type="button" onclick="renderResources()" class="btn">Retry</button>\n      </div>\n    `;
+                logWarnOnce('resources-empty', 'window.resources is empty; showing empty-state.');
+                return;
+            }
+            const html = items.map((r, i) => {
+                const title = r?.title || `Resource ${i+1}`;
+                const href  = r?.href  || null;
+                const desc  = r?.desc  || '';
+                return `\n      <article class="resource-card">\n        <h4>${href ? `<a href="${href}" target="_blank" rel="noopener">${title}</a>` : title}</h4>\n        ${desc ? `<p>${desc}</p>` : ''}\n      </article>\n    `;
+            }).join('');
+            list.innerHTML = html;
+        }
+
+        // Calendar renderer
+        function startOfWeek(d) { const x = new Date(d); const day = x.getDay(); const diff = (day + 6) % 7; x.setDate(x.getDate() - diff); x.setHours(0,0,0,0); return x; }
+        function formatYMD(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+        function renderCalendar(type = 'weekly') {
+            const wrap = first('#calendarGrid', '#calendar', '#calendarContainer', '[data-role="calendar"]');
+            if (!wrap) { logWarnOnce('calendar-container-missing', 'Calendar container not found (expected #calendarGrid/#calendar/#calendarContainer/[data-role="calendar"]).'); return; }
+            const data = window.calendars?.[type];
+            if (!Array.isArray(data) || data.length === 0) {
+                const today = new Date(); const weekStart = startOfWeek(today);
+                const days = Array.from({length:7}, (_,i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate()+i); return { date: formatYMD(d), title: i===0 ? 'Week Start' : 'Daily Reading', notes: i===0 ? 'Fallback calendar. Supply window.calendars to replace.' : 'Placeholder entry.' }; });
+                wrap.innerHTML = `\n      <div class="empty-state info">\n        <h3>Showing fallback ${type} calendar</h3>\n        <p>Provide <code>window.calendars['${type}']</code> with an array of entries to replace this.</p>\n      </div>\n      <div class="calendar-list">\n        ${days.map(d => `\n          <div class="cal-day">\n            <div class="cal-date">${d.date}</div>\n            <div class="cal-title">${d.title}</div>\n            <div class="cal-notes">${d.notes}</div>\n          </div>\n        `).join('')}\n      </div>\n    `;
+                logWarnOnce('calendar-fallback', `No data for calendars['${type}']; rendered fallback week.`);
+                return;
+            }
+            wrap.innerHTML = `\n    <div class="calendar-list">\n      ${data.map((entry,i) => `\n        <div class="cal-day">\n          <div class="cal-date">${entry?.date ?? `Day ${i+1}`}</div>\n          <div class="cal-title">${entry?.title ?? 'Reading'}</div>\n          ${entry?.notes ? `<div class="cal-notes">${entry.notes}</div>` : ''}\n        </div>\n      `).join('')}\n    </div>\n  `;
+        }
+
+        // Safe switches
+        function switchCalendarSafe(el, type) {
+            try {
+                if (el?.closest) {
+                    const group = el.closest('[data-role="calendar-tabs"]');
+                    if (group) group.querySelectorAll('[aria-current="page"]').forEach(b => b.removeAttribute('aria-current'));
+                    el?.setAttribute?.('aria-current', 'page');
+                }
+                renderCalendar(type || 'weekly');
+            } catch (e) { console.error('switchCalendar error:', e); }
+        }
+        function loadResources() { try { renderResources(); } catch (e) { console.error('renderResources error:', e); } }
+
+        document.addEventListener('DOMContentLoaded', () => { try { renderResources(); } catch {} try { renderCalendar('weekly'); } catch {} });
+        </script>
 </body>
 </html>
