@@ -1083,21 +1083,25 @@
             { name: 'V\'Zot HaBerachah', book: 'Deuteronomy', start: '33:1', end: '34:12', date: '2026-10-31' }
         ];
 
-        // Get current parasha based on today's date
+        // Get current parasha based on the week's Shabbat (Saturday)
         function getCurrentParasha() {
             const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-            
-            // Find the most recent parasha (or current week's)
-            let currentParasha = parashaSchedule[0]; // Default to first
-            
+            // Compute current week's Saturday (Shabbat). If today is Saturday, use today.
+            const day = today.getDay(); // 0=Sun ... 6=Sat
+            const daysUntilSat = (6 - day + 7) % 7; // days forward to Saturday (0 if today is Sat)
+            const shabbat = new Date(today);
+            shabbat.setDate(today.getDate() + daysUntilSat);
+            const shabbatStr = shabbat.toISOString().split('T')[0];
+
+            // Find the most recent parasha whose date is <= the Shabbat date
+            let currentParasha = parashaSchedule[0]; // default fallback
             for (let i = parashaSchedule.length - 1; i >= 0; i--) {
-                if (todayStr >= parashaSchedule[i].date) {
+                if (shabbatStr >= parashaSchedule[i].date) {
                     currentParasha = parashaSchedule[i];
                     break;
                 }
             }
-            
+
             return currentParasha;
         }
 
