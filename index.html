@@ -994,8 +994,10 @@
             <!-- Resources Section -->
             <div class="content-section" id="resources">
                 <div class="card">
-                        <div class="card-title">Open Source Torah Sites</div>
-                        <div id="resourcesList" data-role="resources"></div>
+                            <div class="card-title">Open Source Torah Sites</div>
+                            <!-- Preferred resources render target -->
+                            <div id="resourcesSection"></div>
+                            <div id="resourcesList" data-role="resources" style="display:none"></div>
                         <p><strong>Complete Libraries:</strong></p>
                         <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
                             <li><a href="https://www.sefaria.org" target="_blank">Sefaria.org</a> - Complete Jewish texts</li>
@@ -1709,21 +1711,53 @@
             }
         }
 
-        // Hebrew Date
+        // Hebrew Date utilities - prefer offline tables when available
+        function getHebrewDate(date = new Date()) {
+            try {
+                const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+                const table = window.calendarData && window.calendarData.hebrewDates ? window.calendarData.hebrewDates : null;
+                if (table && table[key]) {
+                    // Expecting entries like { hYear: 5786, hMonth: 'Tishrei' or numeric, hDay: 1 }
+                    const found = table[key];
+                    return {
+                        year: found.hYear ?? found.year ?? 5786,
+                        month: found.hMonth ?? found.month ?? found.m ?? found.monthName ?? null,
+                        day: found.hDay ?? found.day ?? found.d ?? date.getDate(),
+                        fromTable: true
+                    };
+                }
+            } catch (e) {
+                console.warn('getHebrewDate table lookup failed', e);
+            }
+
+            // Fallback naive mapping (keeps original behavior)
+            const hebrewMonths = ['Tishrei', 'Cheshvan', 'Kislev', 'Tevet', 'Shevat', 'Adar',
+                                 'Nissan', 'Iyar', 'Sivan', 'Tammuz', 'Av', 'Elul'];
+            const monthIndex = (date.getMonth() + 6) % 12;
+            return {
+                year: 5786,
+                month: hebrewMonths[monthIndex],
+                day: date.getDate(),
+                fromTable: false
+            };
+        }
+
+        // Update visible Hebrew date using table when possible
         function updateHebrewDate() {
             const today = new Date();
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Shabbat'];
             const dayOfWeek = dayNames[today.getDay()];
-            
-            const hebrewMonths = ['Tishrei', 'Cheshvan', 'Kislev', 'Tevet', 'Shevat', 'Adar', 
-                                 'Nissan', 'Iyar', 'Sivan', 'Tammuz', 'Av', 'Elul'];
-            
-            const monthIndex = (today.getMonth() + 6) % 12;
-            const hebrewYear = 5786;
-            const hebrewDay = today.getDate();
-            
-            document.getElementById('hebrewDate').textContent = 
-                `${hebrewDay} ${hebrewMonths[monthIndex]} ${hebrewYear} | ${dayOfWeek}`;
+
+            const h = getHebrewDate(today);
+            const monthLabel = (typeof h.month === 'number') ? `Month ${h.month}` : (h.month || 'Unknown');
+            const hebrewYear = h.year || 5786;
+            const hebrewDay = h.day || today.getDate();
+
+            const el = document.getElementById('hebrewDate');
+            if (el) {
+                el.textContent = `${hebrewDay} ${monthLabel} ${hebrewYear} | ${dayOfWeek}`;
+                if (h.fromTable) el.title = 'Hebrew date from offline table';
+            }
         }
 
         // Toast Notification
@@ -1825,26 +1859,30 @@
         window.resources   ||= [];
         window.calendars   ||= {};
 
-        // Resources renderer
+        // Small helper to escape minimal HTML in resource text
+        function esc(s) { return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+        // Resources renderer (prefers #resourcesSection)
         function renderResources() {
-            const list = first('#resourcesList', '#resources', '[data-role="resources"]');
-            if (!list) {
-                logWarnOnce('resources-container-missing', 'Resources container not found (expected #resourcesList/#resources/[data-role="resources"]).');
+            const target = first('#resourcesSection', '#resourcesList', '#resources', '[data-role="resources"]');
+            if (!target) {
+                logWarnOnce('resources-container-missing', 'Resources container not found (expected #resourcesSection/#resourcesList/#resources/[data-role="resources"]).');
                 return;
             }
+
             const items = ensureArray(window.resources);
             if (items.length === 0) {
-                list.innerHTML = `\n      <div class="empty-state">\n        <h3>No resources yet</h3>\n        <p>We couldn't find any resources to display.</p>\n        <ul class="hints">\n          <li>Check that <code>window.resources</code> is defined and is an array.</li>\n        </ul>\n        <button type="button" onclick="renderResources()" class="btn">Retry</button>\n      </div>\n    `;
-                logWarnOnce('resources-empty', 'window.resources is empty; showing empty-state.');
+                target.innerHTML = '<p style="color:#718096; font-style:italic;">No resources yet. Try again later.</p>';
+                logWarnOnce('resources-empty', 'window.resources is empty; showing lightweight fallback.');
                 return;
             }
-            const html = items.map((r, i) => {
-                const title = r?.title || `Resource ${i+1}`;
-                const href  = r?.href  || null;
-                const desc  = r?.desc  || '';
-                return `\n      <article class="resource-card">\n        <h4>${href ? `<a href="${href}" target="_blank" rel="noopener">${title}</a>` : title}</h4>\n        ${desc ? `<p>${desc}</p>` : ''}\n      </article>\n    `;
+
+            target.innerHTML = items.map(r => {
+                const name = esc(r.name || r.title || 'Resource');
+                const url  = esc(r.url || r.href || '#');
+                const desc = esc(r.desc || '');
+                return `<a class="external-link" href="${url}" target="_blank" rel="noopener">${name}${desc ? ` — ${desc}` : ''}</a>`;
             }).join('');
-            list.innerHTML = html;
         }
 
         // Calendar renderer
@@ -1901,23 +1939,25 @@
         let __hebrewLoaded = false;
         let __hebrewLoadPromise = null;
 
+        // Enhanced loadHebrewTables: loads, populates, and triggers UI
         async function loadHebrewTables() {
-            if (__hebrewLoadPromise) return __hebrewLoadPromise;
-            __hebrewLoadPromise = (async () => {
-                try {
-                    const [hebRes, parRes] = await Promise.all([
-                        fetch('data/hebrew/hebdate-2025.json').then(r => r.ok ? r.json() : null).catch(() => null),
-                        fetch('data/parasha/parasha-5786.json').then(r => r.ok ? r.json() : null).catch(() => null),
-                    ]);
-                    if (hebRes) window.calendarData.hebrewDates = hebRes;
-                    if (parRes) window.calendarData.parasha = parRes;
-                    __hebrewLoaded = true;
-                } catch (e) {
-                    console.warn('Hebrew tables failed to load:', e);
-                    __hebrewLoaded = false;
-                }
-            })();
-            return __hebrewLoadPromise;
+            if (window.__hebrewLoadPromise) return window.__hebrewLoadPromise;
+            window.__hebrewLoadPromise = Promise.all([
+                fetch('/data/hebrew/hebdate-2025.json').then(r => r.json()),
+                fetch('/data/parasha/parasha-5786.json').then(r => r.json())
+            ]).then(([heb, par]) => {
+                window.calendarData = { hebdate: heb, parasha: par };
+                // Populate globals for fallbacks
+                window.calendars = { weekly: hebrewWeeklyFromTables(new Date()) };
+                window.resources = [
+                    { name: 'Sefaria.org', url: 'https://www.sefaria.org', desc: 'Complete Jewish texts' },
+                    { name: 'TorahClass.com', url: 'https://www.torahclass.com', desc: 'Video teachings' }
+                ];
+                renderCalendar('hebrew');
+                try { renderResources(); } catch (e) { console.warn('renderResources failed', e); }
+                showToast('📅 Hebrew Calendar Loaded - Offline Ready!');
+            }).catch(e => console.warn('Heb Load Fail:', e));
+            return window.__hebrewLoadPromise;
         }
 
         function ymd(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}

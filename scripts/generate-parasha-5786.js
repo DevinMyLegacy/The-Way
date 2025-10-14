@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const OUT = path.resolve(__dirname, '..', 'data', 'parasha', 'parasha-5786.json');
+const OUT2 = path.resolve(__dirname, '..', 'data', 'parasha', 'parasha-5787.json');
 const INDEX = path.resolve(__dirname, '..', 'index.html');
 
 function hardcoded() {
@@ -15,6 +16,21 @@ function hardcoded() {
     { date: '2025-10-25', name: 'Noach', diaspora: true },
     { date: '2025-11-01', name: 'Lech-Lecha', diaspora: true }
   ];
+}
+
+async function maybeFetchSefaria(year) {
+  if (!process.env.SEFARIA_API) return null;
+  try {
+    const fetch = require('node-fetch');
+    const url = `${process.env.SEFARIA_API.replace(/\/$/, '')}/calendars?year=${encodeURIComponent(year)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`SEFARIA ${res.status}`);
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.warn('Sefaria fetch failed:', e.message || e);
+    return null;
+  }
 }
 
 function parseFromIndex(html) {
@@ -45,4 +61,31 @@ function ensureDirs(p) {
   ensureDirs(OUT);
   fs.writeFileSync(OUT, JSON.stringify(map, null, 2), 'utf8');
   console.log(`Wrote ${OUT} (${Object.keys(map).length} rows)`);
+  
+  // Also write a seeded 5787 file. Merge hardcoded with optional Sefaria fetch.
+  try {
+    const seed5787 = {
+      ...map,
+      // Placeholder for later years - this keeps structure consistent
+    };
+
+    // Optionally enrich from SEFARIA_API
+    if (process.env.SEFARIA_API) {
+      const sf = await maybeFetchSefaria(5787).catch(() => null);
+      if (sf && typeof sf === 'object') {
+        // Try to parse expected structure { items: [{date,name,diaspora}] }
+        const extras = sf.items || sf.calendar || sf;
+        for (const it of extras) {
+          if (it?.date && it?.name) seed5787[it.date] = { name: it.name, diaspora: it.diaspora !== false };
+        }
+      }
+    }
+
+    ensureDirs(OUT2);
+    fs.writeFileSync(OUT2, JSON.stringify(seed5787, null, 2), 'utf8');
+    console.log(`Wrote ${OUT2} (${Object.keys(seed5787).length} rows)`);
+    console.log('Parasha Empire Seeded - Run npm run gen:parasha for Glory');
+  } catch (e) {
+    console.warn('Failed writing 5787 seed:', e.message || e);
+  }
 })();
