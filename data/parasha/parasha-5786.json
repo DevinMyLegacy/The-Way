@@ -1,14 +1,222 @@
 {
   "2025-10-18": {
-    "name": "Bereshit",
+    "name": "V'Zot HaBerachah",
     "diaspora": true
   },
   "2025-10-25": {
-    "name": "Noach",
+    "name": "Bereshit",
     "diaspora": true
   },
   "2025-11-01": {
+    "name": "Noach",
+    "diaspora": true
+  },
+  "2025-11-08": {
     "name": "Lech-Lecha",
+    "diaspora": true
+  },
+  "2025-11-15": {
+    "name": "Vayera",
+    "diaspora": true
+  },
+  "2025-11-22": {
+    "name": "Chayei Sarah",
+    "diaspora": true
+  },
+  "2025-11-29": {
+    "name": "Toldot",
+    "diaspora": true
+  },
+  "2025-12-06": {
+    "name": "Vayetzei",
+    "diaspora": true
+  },
+  "2025-12-13": {
+    "name": "Vayishlach",
+    "diaspora": true
+  },
+  "2025-12-20": {
+    "name": "Vayeshev",
+    "diaspora": true
+  },
+  "2025-12-27": {
+    "name": "Miketz",
+    "diaspora": true
+  },
+  "2026-01-03": {
+    "name": "Vayigash",
+    "diaspora": true
+  },
+  "2026-01-10": {
+    "name": "Vayechi",
+    "diaspora": true
+  },
+  "2026-01-17": {
+    "name": "Shemot",
+    "diaspora": true
+  },
+  "2026-01-24": {
+    "name": "Vaera",
+    "diaspora": true
+  },
+  "2026-01-31": {
+    "name": "Bo",
+    "diaspora": true
+  },
+  "2026-02-07": {
+    "name": "Beshalach",
+    "diaspora": true
+  },
+  "2026-02-14": {
+    "name": "Yitro",
+    "diaspora": true
+  },
+  "2026-02-21": {
+    "name": "Mishpatim",
+    "diaspora": true
+  },
+  "2026-02-28": {
+    "name": "Terumah",
+    "diaspora": true
+  },
+  "2026-03-07": {
+    "name": "Tetzaveh",
+    "diaspora": true
+  },
+  "2026-03-14": {
+    "name": "Ki Tisa",
+    "diaspora": true
+  },
+  "2026-03-21": {
+    "name": "Vayakhel",
+    "diaspora": true
+  },
+  "2026-03-28": {
+    "name": "Pekudei",
+    "diaspora": true
+  },
+  "2026-04-04": {
+    "name": "Vayikra",
+    "diaspora": true
+  },
+  "2026-04-11": {
+    "name": "Tzav",
+    "diaspora": true
+  },
+  "2026-04-18": {
+    "name": "Shmini",
+    "diaspora": true
+  },
+  "2026-04-25": {
+    "name": "Tazria",
+    "diaspora": true
+  },
+  "2026-05-02": {
+    "name": "Metzora",
+    "diaspora": true
+  },
+  "2026-05-09": {
+    "name": "Achrei Mot",
+    "diaspora": true
+  },
+  "2026-05-16": {
+    "name": "Kedoshim",
+    "diaspora": true
+  },
+  "2026-05-23": {
+    "name": "Emor",
+    "diaspora": true
+  },
+  "2026-05-30": {
+    "name": "Behar",
+    "diaspora": true
+  },
+  "2026-06-06": {
+    "name": "Bechukotai",
+    "diaspora": true
+  },
+  "2026-06-13": {
+    "name": "Bamidbar",
+    "diaspora": true
+  },
+  "2026-06-20": {
+    "name": "Nasso",
+    "diaspora": true
+  },
+  "2026-06-27": {
+    "name": "Beha'alotcha",
+    "diaspora": true
+  },
+  "2026-07-04": {
+    "name": "Sh'lach",
+    "diaspora": true
+  },
+  "2026-07-11": {
+    "name": "Korach",
+    "diaspora": true
+  },
+  "2026-07-18": {
+    "name": "Chukat",
+    "diaspora": true
+  },
+  "2026-07-25": {
+    "name": "Balak",
+    "diaspora": true
+  },
+  "2026-08-01": {
+    "name": "Pinchas",
+    "diaspora": true
+  },
+  "2026-08-08": {
+    "name": "Matot",
+    "diaspora": true
+  },
+  "2026-08-15": {
+    "name": "Masei",
+    "diaspora": true
+  },
+  "2026-08-22": {
+    "name": "Devarim",
+    "diaspora": true
+  },
+  "2026-08-29": {
+    "name": "Vaetchanan",
+    "diaspora": true
+  },
+  "2026-09-05": {
+    "name": "Eikev",
+    "diaspora": true
+  },
+  "2026-09-12": {
+    "name": "Re'eh",
+    "diaspora": true
+  },
+  "2026-09-19": {
+    "name": "Shoftim",
+    "diaspora": true
+  },
+  "2026-09-26": {
+    "name": "Ki Teitzei",
+    "diaspora": true
+  },
+  "2026-10-03": {
+    "name": "Ki Tavo",
+    "diaspora": true
+  },
+  "2026-10-10": {
+    "name": "Nitzavim",
+    "diaspora": true
+  },
+  "2026-10-17": {
+    "name": "Vayeilech",
+    "diaspora": true
+  },
+  "2026-10-24": {
+    "name": "Ha'Azinu",
+    "diaspora": true
+  },
+  "2026-10-31": {
+    "name": "V'Zot HaBerachah",
     "diaspora": true
   }
 }

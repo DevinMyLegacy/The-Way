@@ -11,9 +11,10 @@ const INDEX = path.resolve(__dirname, '..', 'index.html');
 
 function hardcoded() {
   return [
-    { date: '2025-10-18', name: 'Bereshit', diaspora: true },
-    { date: '2025-10-25', name: 'Noach', diaspora: true },
-    { date: '2025-11-01', name: 'Lech-Lecha', diaspora: true }
+    { date: '2025-10-18', name: 'V\'Zot HaBerachah', diaspora: true },
+    { date: '2025-10-25', name: 'Bereshit', diaspora: true },
+    { date: '2025-11-01', name: 'Noach', diaspora: true },
+    { date: '2025-11-08', name: 'Lech-Lecha', diaspora: true }
   ];
 }
 
